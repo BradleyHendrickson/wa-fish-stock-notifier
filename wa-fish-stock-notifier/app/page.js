@@ -1,6 +1,8 @@
 "use client"
 import React, { useEffect, useState } from "react";
 import moment from "moment";
+import SubscriptionForm from "@/components/SubscriptionForm";
+import processSubscriptions from "@/cron/processSubscriptions";
 
 const WaFishStockNotifier = () => {
   const [data, setData] = useState([]);
@@ -60,6 +62,12 @@ const WaFishStockNotifier = () => {
       <div className="bg-green-800 text-white py-4">
         <h1 className="ml-5 text-2xl font-bold">wa-fish-stock-notifier</h1>
       </div>
+
+      <SubscriptionForm />
+
+      <button
+       className=" w-full py-2 px-4 bg-green-700 text-white font-semibold rounded-md shadow hover:bg-green-800 transition-colors"
+      onClick={processSubscriptions}>Process Subscriptions</button>
 
         <div className="w-full max-w-screen-lg px-4 bg-brown-100 py-6 flex flex-col items-center justify-center">
         <h1 className="text-green-900 text-3xl font-bold mb-6 text-center bg-green-100 p-4 rounded-lg shadow-md">
