@@ -2,7 +2,13 @@
 import React, { useEffect, useState } from "react";
 import moment from "moment";
 import SubscriptionForm from "@/components/SubscriptionForm";
-import processSubscriptionsClient from "@/cron/processSubscriptionsClient";
+
+function callServerSubscriptions() {
+  fetch("/api/cron")
+    .then((response) => response.json())
+    .then((data) => console.log(data))
+    .catch((error) => console.error(error));
+}
 
 const WaFishStockNotifier = () => {
   const [data, setData] = useState([]);
@@ -56,9 +62,10 @@ const WaFishStockNotifier = () => {
 
       <SubscriptionForm />
 
-      <button
-       className=" w-full py-2 px-4 bg-green-700 text-white font-semibold rounded-md shadow hover:bg-green-800 transition-colors"
-      onClick={processSubscriptionsClient}>Process Subscriptions</button>
+
+<button
+       className=" w-full py-2 px-4 bg-purple-700 text-white font-semibold rounded-md shadow hover:bg-purple-800 transition-colors"
+      onClick={callServerSubscriptions}>Process Subscriptions Server</button>
 
         <div className="w-full max-w-screen-lg px-4 bg-brown-100 py-6 flex flex-col items-center justify-center">
         <h1 className="text-green-900 text-3xl font-bold mb-6 text-center bg-green-100 p-4 rounded-lg shadow-md">

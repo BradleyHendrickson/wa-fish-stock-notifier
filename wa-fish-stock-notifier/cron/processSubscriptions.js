@@ -1,3 +1,6 @@
+"use server"
+import { createClient } from '@/utils/supabase/server';
+
 // Utility function to check if a stocking event is new
 function isNewRelease(releaseStartDate, lastStockedDate) {
     const releaseDate = new Date(releaseStartDate);
@@ -5,7 +8,7 @@ function isNewRelease(releaseStartDate, lastStockedDate) {
 }
 
 export default async function processSubscriptions(client) {
-    const supabase = client
+    const supabase = createClient();
 
     // Fetch all subscriptions
     const { data: subscriptions, error: supabaseError } = await supabase.from('subscription').select('*');
