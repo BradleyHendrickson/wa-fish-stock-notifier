@@ -2,7 +2,7 @@
 import React, { useEffect, useState } from "react";
 import moment from "moment";
 import SubscriptionForm from "@/components/SubscriptionForm";
-import processSubscriptions from "@/cron/processSubscriptions";
+import processSubscriptionsClient from "@/cron/processSubscriptionsClient";
 
 const WaFishStockNotifier = () => {
   const [data, setData] = useState([]);
@@ -39,15 +39,6 @@ const WaFishStockNotifier = () => {
       });
   }, []);
 
-  if (loading) {
-    return <p>Loading...</p>;
-  }
-
-  if (error) {
-    return <p>Error: {error.message}</p>;
-  }
-  
-
   const filteredData = data.filter((item) => {
     const releaseYear = new Date(item.release_start_date).getFullYear();
     return releaseYear === new Date().getFullYear();
@@ -67,7 +58,7 @@ const WaFishStockNotifier = () => {
 
       <button
        className=" w-full py-2 px-4 bg-green-700 text-white font-semibold rounded-md shadow hover:bg-green-800 transition-colors"
-      onClick={processSubscriptions}>Process Subscriptions</button>
+      onClick={processSubscriptionsClient}>Process Subscriptions</button>
 
         <div className="w-full max-w-screen-lg px-4 bg-brown-100 py-6 flex flex-col items-center justify-center">
         <h1 className="text-green-900 text-3xl font-bold mb-6 text-center bg-green-100 p-4 rounded-lg shadow-md">
