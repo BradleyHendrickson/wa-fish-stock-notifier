@@ -141,5 +141,7 @@ export default async function processSubscriptions(client) {
             }
         }
     }
+
+    return toNotify;
    
 }
