@@ -87,6 +87,7 @@ const SubscriptionForm = () => {
                         <p className="text-black text-sm mt-2">
                             <strong>Email:</strong> {email}
                         </p>
+
                         <p className="text-black text-sm mt-2">
                             <strong>Subscribed Locations:</strong>
                             <ul className="mt-1 list-disc list-inside">

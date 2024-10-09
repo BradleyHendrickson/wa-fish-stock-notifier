@@ -1,13 +1,14 @@
 import * as React from 'react';
 
 export function EmailTemplate(stockinginfoArray) {
-
-  console.log(stockinginfoArray)
+  console.log(stockinginfoArray);
 
   return (
-    <div className="bg-green-100 text-black p-6 rounded-lg shadow-lg max-w-lg mx-auto">
-      <h1 className="text-2xl font-bold mb-4 text-center"><strong>Stocking Events Details</strong></h1>
-      <div className="space-y-8">
+    <div style={{ backgroundColor: '#f0fdf4', color: '#000', padding: '24px', borderRadius: '8px', maxWidth: '600px', margin: '0 auto', boxShadow: '0 4px 6px rgba(0, 0, 0, 0.1)' }}>
+      <h1 style={{ fontSize: '24px', fontWeight: 'bold', marginBottom: '16px', textAlign: 'center' }}>
+        <strong>Stocking Events Details</strong>
+      </h1>
+      <div>
         {stockinginfoArray.map((stockinginfo, index) => {
           const { release_start_date, species, number_released, number_of_fish_per_pound, release_location } = stockinginfo;
 
@@ -18,37 +19,36 @@ export function EmailTemplate(stockinginfoArray) {
           });
 
           return (
-            <React.Fragment key={index} >
-            <div className="bg-white p-4 rounded-lg shadow-sm">
-              <div className="space-y-4">
-                {/* Location displayed in larger font */}
-                <div className="text-xl font-bold">
-                  <strong>{release_location}</strong>
-                </div>
+            <React.Fragment key={index}>
+              <div style={{ backgroundColor: '#fff', padding: '16px', borderRadius: '8px', boxShadow: '0 1px 3px rgba(0, 0, 0, 0.1)', marginBottom: '16px' }}>
                 <div>
-                  <span className="font-semibold">Release Date: </span>
-                  <span>{formattedDate}</span>
-                </div>
-                <div>
-                  <span className="font-semibold">Species: </span>
-                  <span>{species}</span>
-                </div>
-                <div>
-                  <span className="font-semibold">Count: </span>
-                  <span>{number_released.toLocaleString()}</span>
-                </div>
-                <div>
-                  <span className="font-semibold">Fish per Pound: </span>
-                  <span>{number_of_fish_per_pound}</span>
+                  {/* Location displayed in larger font */}
+                  <div style={{ fontSize: '20px', fontWeight: 'bold', marginBottom: '8px' }}>
+                    <strong>{release_location}</strong>
+                  </div>
+                  <div style={{ marginBottom: '4px' }}>
+                    <span style={{ fontWeight: '600' }}>Release Date: </span>
+                    <span>{formattedDate}</span>
+                  </div>
+                  <div style={{ marginBottom: '4px' }}>
+                    <span style={{ fontWeight: '600' }}>Species: </span>
+                    <span>{species}</span>
+                  </div>
+                  <div style={{ marginBottom: '4px' }}>
+                    <span style={{ fontWeight: '600' }}>Count: </span>
+                    <span>{number_released.toLocaleString()}</span>
+                  </div>
+                  <div>
+                    <span style={{ fontWeight: '600' }}>Fish per Pound: </span>
+                    <span>{number_of_fish_per_pound}</span>
+                  </div>
                 </div>
               </div>
-            </div>
-            <hr/>
             </React.Fragment>
           );
         })}
       </div>
-      <footer className="mt-6 text-center text-sm text-gray-600">
+      <footer style={{ marginTop: '24px', textAlign: 'center', fontSize: '12px', color: '#4b5563' }}>
         Data provided by data.wa.gov
       </footer>
     </div>
