@@ -1,7 +1,7 @@
 import * as React from 'react';
 
 
-export function EmailTemplate({body}) {
+export function EmailTemplate(body) {
 
   return (
       <div>
