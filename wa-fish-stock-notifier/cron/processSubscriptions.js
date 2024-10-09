@@ -11,7 +11,7 @@ function isNewRelease(releaseStartDate, lastStockedDate) {
     return releaseDate > new Date(lastStockedDate);
 }
 
-async function sendEmail(from, to, subject) {
+async function sendEmail(from, to, subject, body) {
     try {
         const { data, error } = await resend.emails.send({
           from: from,
