@@ -7,6 +7,24 @@ const SubscriptionForm = () => {
 
     const [email, setEmail] = useState('');
     const [lakes, setLakes] = useState([]);
+    const [feedbackMessage, setFeedbackMessage] = useState(''); // For feedback messages
+    const [isError, setIsError] = useState(false); // To track if the feedback is an error or success
+    const [isSubmitted, setIsSubmitted] = useState(false); // To track form submission
+
+    const locations = [
+        {
+            key: 'BATTLE GROUND LK (CLAR)',
+            value: 'Battle Ground Lake'
+        },
+        {key: 'KLINELINE PD (CLAR)', value: 'Klineline Pond'},
+        {key: 'LEWIS R -NF  27.0168', value: 'North Fork, Lewis River'},
+        {key: 'COWLITZ R    26.0002', value: 'Cowlitz River'},
+        {key: 'FORK CR      24.0356', value: 'Fork Creek'}
+    ]
+
+    function getNameFromLocation(location) {
+        return locations.find((loc) => loc.key === location).value;
+    }
 
     function handleSubmit(e) {
         e.preventDefault();
@@ -24,29 +42,27 @@ const SubscriptionForm = () => {
             .from('subscription')
             .insert(newSubscription)
             .then((response) => {
-                console.log('Subscription added successfully:', response);
+                if (response.error && response.status === 409) {
+                    // Duplicate entry
+                    setIsError(true);
+                    setFeedbackMessage('You are already subscribed with this email address.');
+                } else if (response.error) {
+                    // Some other error
+                    setIsError(true);
+                    setFeedbackMessage('An error occurred while adding your subscription.');
+                } else {
+                    // Success case
+                    setIsError(false);
+                    setFeedbackMessage('Subscription added successfully!');
+                    setIsSubmitted(true); // Transition to confirmation
+                }
             })
             .catch((error) => {
                 console.error('Error adding subscription:', error);
+                setIsError(true);
+                setFeedbackMessage('An unexpected error occurred.');
             });
-            /*
-            TODO:
-            Implement error message, if the email already exists in the database.
-            Confirm with user that they will be updating their subscription
-            {
-                "error": {
-                    "code": "23505",
-                    "details": null,
-                    "hint": null,
-                    "message": "duplicate key value violates unique constraint \"subscription_email_key\""
-                },
-                "data": null,
-                "count": null,
-                "status": 409,
-                "statusText": ""
-            }
-            */
-    };
+    }
 
     // Handle multiple selections
     function handleLakeChange(e) {
@@ -61,55 +77,86 @@ const SubscriptionForm = () => {
     }
 
     return (
-        <div className="flex justify-center items-center min-h-screen bg-gray-100">
+        <div className="flex justify-center items-center min-h-screen">
             <div className="bg-white shadow-lg rounded-lg p-6 max-w-md w-full">
-                <h2 className="text-2xl font-semibold mb-1 text-green-700">Get notified!</h2>
-                <h5 className="text-sm text-gray-500 mb-4">Get an email when your lake is stocked with fish.</h5>
-                <form onSubmit={handleSubmit} className="space-y-4">
-                    {/* Email Field */}
+                {/* Form or Confirmation */}
+                {isSubmitted ? (
                     <div>
-                        <label htmlFor="email" className="block text-black text-sm font-medium">
-                            Email
-                        </label>
-                        <input
-                            type="email"
-                            id="email"
-                            value={email}
-                            onChange={(e) => setEmail(e.target.value)}
-                            required
-                            className="mt-1 block w-full p-2 border border-gray-300 rounded-md shadow-sm focus:outline-none focus:ring-2 focus:ring-green-500"
-                        />
+                        <h2 className="text-2xl font-semibold mb-1 text-green-700">Subscription Confirmed!</h2>
+                        <p className="text-black text-lg font-medium">Thank you for subscribing.</p>
+                        <p className="text-black text-sm mt-2">
+                            <strong>Email:</strong> {email}
+                        </p>
+                        <p className="text-black text-sm mt-2">
+                            <strong>Subscribed Locations:</strong>
+                            <ul className="mt-1 list-disc list-inside">
+                                {lakes.map((lake, index) => (
+                                    <li key={index} className="text-black">{getNameFromLocation(lake)}</li>
+                                ))}
+                            </ul>
+                        </p>
                     </div>
+                ) : (
+                    <form onSubmit={handleSubmit} className="space-y-4">
+                        <h2 className="text-2xl font-semibold mb-1 text-green-700">Get notified!</h2>
+                        <h5 className="text-sm text-gray-500 mb-4">Get an email when your lake is stocked with fish.</h5>
 
-                    {/* Lake Multi-Select Dropdown */}
-                    <div>
-                        <label htmlFor="lake" className="block text-black text-sm font-medium">
-                            Select locations to subscribe to
-                        </label>
-                        <select
-                            id="lake"
-                            multiple
-                            value={lakes}
-                            onChange={handleLakeChange}
-                            required
-                            className="mt-1 block w-full p-2 border border-gray-300 rounded-md shadow-sm focus:outline-none focus:ring-2 focus:ring-green-500"
+                        {/* Email Field */}
+                        <div>
+                            <label htmlFor="email" className="block text-black text-sm font-medium">
+                                Email
+                            </label>
+                            <input
+                                type="email"
+                                id="email"
+                                value={email}
+                                onChange={(e) => setEmail(e.target.value)}
+                                required
+                                className="mt-1 block w-full p-2 border border-gray-300 rounded-md shadow-sm focus:outline-none focus:ring-2 focus:ring-green-500"
+                            />
+                        </div>
+
+                        {/* Lake Multi-Select Dropdown */}
+                        <div>
+                            <label htmlFor="lake" className="block text-black text-sm font-medium">
+                                Select locations to subscribe to
+                            </label>
+                            <select
+                                id="lake"
+                                multiple
+                                value={lakes}
+                                onChange={handleLakeChange}
+                                required
+                                className="mt-1 block w-full p-2 border border-gray-300 rounded-md shadow-sm focus:outline-none focus:ring-2 focus:ring-green-500"
+                            >
+                                <option value="BATTLE GROUND LK (CLAR)">Battle Ground Lake</option>
+                                <option value="KLINELINE PD (CLAR)">Klineline Pond</option>
+                                <option value="LEWIS R -NF  27.0168">North Fork, Lewis River</option>
+                                <option value="COWLITZ R    26.0002">Cowlitz River</option>
+                                <option value="FORK CR      24.0356">Fork Creek</option>
+                            </select>
+                        </div>
+
+                        {/* Submit Button */}
+                        <button
+                            type="submit"
+                            className="w-full py-2 px-4 bg-green-700 text-white font-semibold rounded-md shadow hover:bg-green-800 transition-colors"
                         >
-                            <option value="BATTLE GROUND LK (CLAR)">Battle Ground Lake</option>
-                            <option value="KLINELINE PD (CLAR)">Klineline Pond</option>
-                            <option value="LEWIS R -NF  27.0168">North Fork, Lewis River</option>
-                            <option value="COWLITZ R    26.0002">Cowlitz River</option>
-                            <option value="FORK CR      24.0356">Fork Creek</option>
-                        </select>
-                    </div>
+                            Submit
+                        </button>
 
-                    {/* Submit Button */}
-                    <button
-                        type="submit"
-                        className="w-full py-2 px-4 bg-green-700 text-white font-semibold rounded-md shadow hover:bg-green-800 transition-colors"
-                    >
-                        Submit
-                    </button>
-                </form>
+                        {/* Feedback Message */}
+                        {feedbackMessage && (
+                            <div
+                                className={`mt-4 p-2 rounded ${
+                                    isError ? 'bg-red-100 text-red-700' : 'bg-green-100 text-green-700'
+                                }`}
+                            >
+                                {feedbackMessage}
+                            </div>
+                        )}
+                    </form>
+                )}
             </div>
         </div>
     );
