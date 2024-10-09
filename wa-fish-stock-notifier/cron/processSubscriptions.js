@@ -176,6 +176,7 @@ export default async function processSubscriptions(client) {
         const subject = `Stocking Event Notification`;
 
         if (stockingEvents.length > 0) {
+            console.log('sending email for', subscription.email);
             await sendEmail(from, to, subject, stockingEvents);
         } else {
             console.log('no new stocking events to send for', subscription.email);

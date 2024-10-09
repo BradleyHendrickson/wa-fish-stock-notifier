@@ -2,6 +2,8 @@ import * as React from 'react';
 
 export function EmailTemplate(stockinginfoArray) {
 
+  console.log(stockinginfoArray)
+
   return (
     <div className="bg-green-100 text-black p-6 rounded-lg shadow-lg max-w-lg mx-auto">
       <h1 className="text-2xl font-bold mb-4 text-center"><strong>Stocking Events Details</strong></h1>
@@ -16,7 +18,8 @@ export function EmailTemplate(stockinginfoArray) {
           });
 
           return (
-            <div key={index} className="bg-white p-4 rounded-lg shadow-sm">
+            <React.Fragment key={index} >
+            <div className="bg-white p-4 rounded-lg shadow-sm">
               <div className="space-y-4">
                 {/* Location displayed in larger font */}
                 <div className="text-xl font-bold">
@@ -40,6 +43,8 @@ export function EmailTemplate(stockinginfoArray) {
                 </div>
               </div>
             </div>
+            <hr/>
+            </React.Fragment>
           );
         })}
       </div>
