@@ -3,7 +3,7 @@ import * as React from 'react';
 
 export function EmailTemplate(stockinginfo) {
 
-  const { release_start_date, species, number_released, number_of_fish_per_pound } = stockinginfo?.stockingEvent;
+  const { release_start_date, species, number_released, number_of_fish_per_pound } = stockinginfo
 
   const formattedDate = new Date(release_start_date).toLocaleDateString('en-US', {
     year: 'numeric',
