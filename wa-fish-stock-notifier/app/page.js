@@ -61,7 +61,7 @@ const WaFishStockNotifier = () => {
       <div
         className="relative flex items-center justify-center bg-cover bg-center bg-no-repeat"
         style={{
-          backgroundImage: "url('/images/fish.png')",
+          backgroundImage: "url('/images/fish.webp')",
           backgroundSize: "cover",
         }}
       >
