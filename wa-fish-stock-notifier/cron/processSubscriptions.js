@@ -17,7 +17,7 @@ async function sendEmail(from, to, subject) {
           from: from,
           to: to,
           subject: subject,
-          react: EmailTemplate(),
+          react: EmailTemplate(body),
         });
     
         if (error) {
@@ -166,7 +166,9 @@ export default async function processSubscriptions(client) {
                 const from = 'WA Fish Stock Notifier <notifier@wa-fish-stock-notifier.com>';
                 const to = [subscription.email];
                 const subject = `New stocking event at ${location}`;
-                await sendEmail(from, to, subject);
+                const body = `A new stocking event has been detected at ${location}, ${JSON.stringify(found.stockingEvent)}`;
+
+                await sendEmail(from, to, subject, body);
 
             }
         }
