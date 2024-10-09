@@ -1,10 +1,33 @@
 "use server"
 import { createClient } from '@/utils/supabase/server';
+import { EmailTemplate } from '@/components/EmailTemplate';
+import { Resend } from 'resend';
+
+const resend = new Resend(process.env.RESEND_API_KEY);
 
 // Utility function to check if a stocking event is new
 function isNewRelease(releaseStartDate, lastStockedDate) {
     const releaseDate = new Date(releaseStartDate);
     return releaseDate > new Date(lastStockedDate);
+}
+
+async function sendEmail(from, to, subject) {
+    try {
+        const { data, error } = await resend.emails.send({
+          from: from,
+          to: to,
+          subject: subject,
+          react: EmailTemplate(),
+        });
+    
+        if (error) {
+          return Response.json({ error }, { status: 500 });
+        }
+    
+        return Response.json(data);
+      } catch (error) {
+        return Response.json({ error }, { status: 500 });
+      }
 }
 
 export default async function processSubscriptions(client) {
@@ -137,6 +160,13 @@ export default async function processSubscriptions(client) {
                     sent: false
                 };
                 await supabase.from('email_queue').insert(newEmail);
+
+
+                // generate the email and send it
+                const from = 'WA Fish Stock Notifier <notifier@wa-fish-stock-notifier.com>';
+                const to = [subscription.email];
+                const subject = `New stocking event at ${location}`;
+                await sendEmail(from, to, subject);
 
             }
         }

@@ -3,12 +3,28 @@ import React, { useEffect, useState } from "react";
 import moment from "moment";
 import SubscriptionForm from "@/components/SubscriptionForm";
 
-function callServerSubscriptions() {
-  fetch("/api/cron")
-    .then((response) => response.json())
-    .then((data) => console.log(data))
-    .catch((error) => console.error(error));
+function tryEmail() {
+  fetch("/api/send", {
+    method: "POST", // Change to POST request
+    headers: {
+      "Content-Type": "application/json", // Set appropriate headers
+    },
+    body: JSON.stringify({
+      // Include the data you want to send in the body
+      subject: "Test Email",
+      message: "This is a test email being sent via POST request."
+    }),
+  })
+    .then((response) => {
+      if (!response.ok) {
+        throw new Error("Network response was not ok");
+      }
+      return response.json(); // Parse JSON from the response
+    })
+    .then((data) => console.log(data)) // Log the response data
+    .catch((error) => console.error("Error:", error));
 }
+
 
 const WaFishStockNotifier = () => {
   const [data, setData] = useState([]);
@@ -68,6 +84,10 @@ const WaFishStockNotifier = () => {
         </h1>
 
 
+        <button onClick = {tryEmail} className="bg-green-800 text-white px-4 py-2 rounded-lg shadow-md mb-4">
+          Send Email
+        </button>
+ 
           {/*<pre>{JSON.stringify(filteredData, null, 2)}</pre>*/}
 
           <div className="overflow-x-auto">
