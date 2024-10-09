@@ -53,7 +53,7 @@ const WaFishStockNotifier = () => {
   return (
     <div className="min-h-screen flex flex-col">
       {/* Top bar */}
-      <div className="bg-green-800 text-white py-4">
+      <div className="bg-green-800 text-white py-4 sticky top-0 z-50">
         <h1 className="ml-5 text-2xl font-bold">wa-fish-stock-notifier</h1>
       </div>
 

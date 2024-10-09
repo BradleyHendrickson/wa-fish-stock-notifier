@@ -5,6 +5,25 @@ import { Resend } from 'resend';
 
 const resend = new Resend(process.env.RESEND_API_KEY);
 
+/* 
+import { createServerClient, type CookieOptions } from '@supabase/ssr'
+import { cookies } from 'next/headers'
+export async function GET(request: NextRequest, response: NextResponse) {
+const cookieStore = cookies()
+
+const supabase = createServerClient(
+process.env.NEXT_PUBLIC_SUPABASE_URL!,
+process.env.SUPABASE_SERVICE_ROLE_KEY!,
+{
+cookies: {
+get(name: string) {
+return cookieStore.get(name)?.value
+},
+},
+}
+)
+*/
+
 // Utility function to check if a stocking event is new
 function isNewRelease(releaseStartDate, lastStockedDate) {
     const releaseDate = new Date(releaseStartDate);
