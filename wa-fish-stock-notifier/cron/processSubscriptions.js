@@ -148,6 +148,8 @@ export default async function processSubscriptions(client) {
     for (const subscription of subscriptions) {
         console.log('processing subscription for', subscription.email);
 
+        var stockingEvents = [];
+
         for (const location of subscription.locations) {
             const found = toNotify.find((item) => item.location === location);
             if (found) {
@@ -161,15 +163,22 @@ export default async function processSubscriptions(client) {
                 };
                 await supabase.from('email_queue').insert(newEmail);
 
+                // add the stocking event to the stockingEvents array
+                stockingEvents.push(found.stockingEvent)
 
-                // generate the email and send it
-                const from = 'WA Fish Stock Notifier <notifier@wa-fish-stock-notifier.com>';
-                const to = [subscription.email];
-                const subject = `New stocking event at ${location}`;
-
-                await sendEmail(from, to, subject, found.stockingEvent);
 
             }
+        }
+
+``      // generate the email and send it
+        const from = 'WA Fish Stock Notifier <notifier@wa-fish-stock-notifier.com>';
+        const to = [subscription.email];
+        const subject = `Stocking Event Notification`;
+
+        if (stockingEvents.length > 0) {
+            await sendEmail(from, to, subject, stockingEvents);
+        } else {
+            console.log('no new stocking events to send for', subscription.email);
         }
     }
 
