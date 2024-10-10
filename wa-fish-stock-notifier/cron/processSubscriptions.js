@@ -100,8 +100,9 @@ export default async function processSubscriptions(client) {
             }    
             
             
-            //get the record with the latest release_end_date
-            const latestStocking = stockingData.reduce((prev, current) => (new Date(prev.release_end_date) > new Date(current.release_end_date)) ? prev : current);
+
+                
+            const latestStocking = stockingData.length > 0 ? stockingData.reduce((prev, current) => (new Date(prev.release_end_date) > new Date(current.release_end_date)) ? prev : current) : null;
             console.log('latestStocking', latestStocking);
 
             // Find the last stocked date for the location
@@ -112,7 +113,7 @@ export default async function processSubscriptions(client) {
 
 
             // If the location is in the lastStocked table, update it
-            if (lastStockedLocation) {
+            if (lastStockedLocation && latestStocking) {
                 console.log('Location found in lastStocked table, updating it', lastStockedLocation);
                 
                 const updateData = {
@@ -136,7 +137,7 @@ export default async function processSubscriptions(client) {
 
 
             // If the location is not in the lastStocked table, add it
-            else if (!lastStockedLocation) {
+            else if (!lastStockedLocation && latestStocking) {
                 console.log('location not found in lastStocked table, adding it');
                 const newLastStocked = {
                     location: location,
@@ -151,7 +152,7 @@ export default async function processSubscriptions(client) {
             }
 
             // Check if the latest stocking event is new
-            if (!lastStockedLocation || isNewRelease(latestStocking.release_start_date.substring(0,10), lastStockedLocation?.last_stocked)) {
+            if ((!lastStockedLocation || isNewRelease(latestStocking.release_start_date.substring(0,10), lastStockedLocation?.last_stocked)) && latestStocking) {
                 console.log('new stocking event found for', location);
                 console.log(latestStocking.release_start_date, lastStockedLocation?.last_stocked, isNewRelease(latestStocking.release_start_date, lastStockedLocation?.last_stocked));
                 toNotify.push({ location: location, stockingEvent: latestStocking });

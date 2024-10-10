@@ -89,6 +89,16 @@ const WaFishStockNotifier = () => {
 
       <div className="w-full max-w-screen-lg px-4 bg-brown-100 py-6 mx-auto">
 
+        {/*
+        <div className="
+          flex justify-center items-center 
+          bg-green-100 text-green-900 p-4 rounded-lg shadow-md
+        ">
+          <button onClick={callServerSubscriptions} className="bg-green-800 text-white px-4 py-2 rounded-lg">
+            Test Subscriptions
+          </button>
+        </div>*/}
+
         <h1 className="text-green-900 text-3xl font-bold mb-6 mt-5">
           10 Most Recent Stocking Events
         </h1>
