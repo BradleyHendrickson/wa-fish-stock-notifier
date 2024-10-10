@@ -1,6 +1,7 @@
 'use client'
-import React, { useState } from 'react';
+import React, { useState, useEffect } from 'react';
 import { createClient } from '@/utils/supabase/client';
+
 
 const SubscriptionForm = () => {
     const supabase = createClient();
@@ -10,20 +11,24 @@ const SubscriptionForm = () => {
     const [feedbackMessage, setFeedbackMessage] = useState(''); // For feedback messages
     const [isError, setIsError] = useState(false); // To track if the feedback is an error or success
     const [isSubmitted, setIsSubmitted] = useState(false); // To track form submission
+    const [locations, setLocations] = useState([]);
 
-    const locations = [
-        {
-            key: 'BATTLE GROUND LK (CLAR)',
-            value: 'Battle Ground Lake'
-        },
-        {key: 'KLINELINE PD (CLAR)', value: 'Klineline Pond'},
-        {key: 'LEWIS R -NF  27.0168', value: 'North Fork, Lewis River'},
-        {key: 'COWLITZ R    26.0002', value: 'Cowlitz River'},
-        {key: 'FORK CR      24.0356', value: 'Fork Creek'}
-    ]
+    async function getLocationsFromSupabase() {
+        supabase.from('location').select('*').then((response) => {
+            if (response.error) {
+                console.error('Error fetching locations:', response.error);
+            } else {
+                setLocations(response.data);
+            }
+        });
+    }
+
+    useEffect(() => {
+        getLocationsFromSupabase();
+    }, []);
 
     function getNameFromLocation(location) {
-        return locations.find((loc) => loc.key === location).value;
+        return locations.find((loc) => loc.key === location).location
     }
 
     function handleSubmit(e) {
@@ -92,7 +97,7 @@ const SubscriptionForm = () => {
                             <strong>Subscribed Locations:</strong>
                             <ul className="mt-1 list-disc list-inside">
                                 {lakes.map((lake, index) => (
-                                    <li key={index} className="text-black">{getNameFromLocation(lake)}</li>
+                                    <li key={index} className="text-black">{lake}</li>
                                 ))}
                             </ul>
                         </p>
@@ -130,11 +135,11 @@ const SubscriptionForm = () => {
                                 required
                                 className="mt-1 block w-full p-2 border border-gray-300 rounded-md shadow-sm focus:outline-none focus:ring-2 focus:ring-green-500"
                             >
-                                <option value="BATTLE GROUND LK (CLAR)">Battle Ground Lake</option>
-                                <option value="KLINELINE PD (CLAR)">Klineline Pond</option>
-                                <option value="LEWIS R -NF  27.0168">North Fork, Lewis River</option>
-                                <option value="COWLITZ R    26.0002">Cowlitz River</option>
-                                <option value="FORK CR      24.0356">Fork Creek</option>
+                                {locations?.map((location) => (
+                                    <option key={location.location} value={location.location}>
+                                        {location.location}
+                                    </option>
+                                ))}
                             </select>
                         </div>
 
