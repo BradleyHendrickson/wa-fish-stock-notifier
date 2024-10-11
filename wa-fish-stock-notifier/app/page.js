@@ -89,7 +89,6 @@ const WaFishStockNotifier = () => {
 
       <div className="w-full max-w-screen-lg px-4 bg-brown-100 py-6 mx-auto">
 
-        {/*
         <div className="
           flex justify-center items-center 
           bg-green-100 text-green-900 p-4 rounded-lg shadow-md
@@ -97,7 +96,7 @@ const WaFishStockNotifier = () => {
           <button onClick={callServerSubscriptions} className="bg-green-800 text-white px-4 py-2 rounded-lg">
             Test Subscriptions
           </button>
-        </div>*/}
+        </div>
 
         <h1 className="text-green-900 text-3xl font-bold mb-6 mt-5">
           10 Most Recent Stocking Events
@@ -106,6 +105,7 @@ const WaFishStockNotifier = () => {
         {/* show the 10 most recent stocking events: 
           release_start_date, release_location, county, species, number_released
         */}
+        <div className="overflow-x-auto">
         <table className="min-w-full bg-brown-100 border border-green-800">
           <thead>
             <tr className="bg-green-800 text-white">
@@ -141,7 +141,7 @@ const WaFishStockNotifier = () => {
             ))}
           </tbody>
         </table>
-
+        </div>
 
         {/*}
         <h1 className="text-green-900 text-3xl font-bold mb-6 text-center bg-green-100 p-4 rounded-lg shadow-md">
