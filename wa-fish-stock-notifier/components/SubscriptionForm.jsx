@@ -97,7 +97,7 @@ const SubscriptionForm = () => {
                             <strong>Subscribed Locations:</strong>
                             <ul className="mt-1 list-disc list-inside">
                                 {lakes.map((lake, index) => (
-                                    <li key={index} className="text-black">{lake}</li>
+                                    <li key={index} className="text-black">{lake.description}</li>
                                 ))}
                             </ul>
                         </p>
@@ -135,9 +135,9 @@ const SubscriptionForm = () => {
                                 required
                                 className="mt-1 block w-full p-2 border border-gray-300 rounded-md shadow-sm focus:outline-none focus:ring-2 focus:ring-green-500"
                             >
-                                {locations?.map((location) => (
+                                {locations?.filter((a) => a.description)?.map((location) => (
                                     <option key={location.location} value={location.location}>
-                                        {location.location}
+                                        {location.description} - {location.county}
                                     </option>
                                 ))}
                             </select>

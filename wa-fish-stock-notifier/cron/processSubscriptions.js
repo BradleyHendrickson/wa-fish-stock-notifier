@@ -4,6 +4,7 @@ import { EmailTemplate } from '@/components/EmailTemplate';
 import { Resend } from 'resend';
 
 const resend = new Resend(process.env.RESEND_API_KEY);
+const appToken = process.env.WDFW_DATA_APP_TOKEN;
 
 /* 
 import { createServerClient, type CookieOptions } from '@supabase/ssr'
@@ -87,7 +88,12 @@ export default async function processSubscriptions(client) {
             console.log('processing location', location);
 
             // Fetch the latest stocking data for the location
-            const response = await fetch(`https://data.wa.gov/resource/6fex-3r7d.json?release_location=${location}`);
+            const response = await fetch(`https://data.wa.gov/resource/6fex-3r7d.json?release_location=${location}`, {
+                headers: {
+                  'X-App-Token': appToken // using the app token reduces throttling
+                }
+              });
+              
 
             var stockingData
 
