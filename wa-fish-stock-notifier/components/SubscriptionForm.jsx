@@ -101,6 +101,13 @@ const SubscriptionForm = () => {
                                 ))}
                             </ul>
                         </p>
+
+                        <p className="text-black text-sm mt-2">
+                            Please donate to support future development!
+                            <a href='https://ko-fi.com/J3J714R6RN' target='_blank'>
+						<img height='36' style={{border:"0px", height:"50px", marginTop:"10px"}} src='https://storage.ko-fi.com/cdn/kofi2.png?v=3' alt='Buy Me a Coffee at ko-fi.com' />
+						</a>
+                        </p>
                     </div>
                 ) : (
                     <form onSubmit={handleSubmit} className="space-y-4">
