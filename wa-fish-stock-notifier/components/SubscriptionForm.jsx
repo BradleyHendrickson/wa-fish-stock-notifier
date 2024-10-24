@@ -13,6 +13,22 @@ const SubscriptionForm = () => {
     const [isSubmitted, setIsSubmitted] = useState(false); // To track form submission
     const [locations, setLocations] = useState([]);
 
+
+    const [counties, setCounties] = useState([]);
+    const [selectedCounty, setSelectedCounty] = useState('');
+
+    async function getCountiesFromSupabase() {
+        supabase.from('county').select('*').then((response) => {
+            if (response.error) {
+                console.error('Error fetching counties:', response.error);
+            } else {
+                console.log(response.data);
+                setCounties(response.data);
+            }
+        });
+    }
+
+
     async function getLocationsFromSupabase() {
         supabase.from('location').select('*').then((response) => {
             if (response.error) {
@@ -25,6 +41,7 @@ const SubscriptionForm = () => {
 
     useEffect(() => {
         getLocationsFromSupabase();
+        getCountiesFromSupabase();
     }, []);
 
     function getNameFromLocation(location) {
@@ -81,6 +98,10 @@ const SubscriptionForm = () => {
         setLakes(selectedLakes);
     }
 
+    function getNameFromLocation(location) {
+        return locations.find((loc) => loc.location === location)?.description || location;
+    }
+
     return (
         <div className="flex justify-center items-center min-h-screen">
             <div className="bg-white shadow-lg rounded-lg p-6 max-w-md w-full">
@@ -88,26 +109,38 @@ const SubscriptionForm = () => {
                 {isSubmitted ? (
                     <div>
                         <h2 className="text-2xl font-semibold mb-1 text-green-700">Subscription Confirmed!</h2>
-                        <p className="text-black text-lg font-medium">Thank you for subscribing.</p>
+                        <p className="text-black text-md font-medium mb-5">Thank you for subscribing.</p>
                         <p className="text-black text-sm mt-2">
                             <strong>Email:</strong> {email}
                         </p>
 
-                        <p className="text-black text-sm mt-2">
+                        <div className="text-black text-sm mt-2">
                             <strong>Subscribed Locations:</strong>
                             <ul className="mt-1 list-disc list-inside">
-                                {lakes.map((lake, index) => (
-                                    <li key={index} className="text-black">{lake.description}</li>
-                                ))}
-                            </ul>
-                        </p>
+                                {
+                                    lakes.map((lake, index) => (
+                                        <li key={index}>{getNameFromLocation(lake)}</li>
+                                    ))
 
-                        <p className="text-black text-sm mt-2">
+                                }
+                            </ul>
+                        </div>
+
+                        <div className="text-black text-sm mt-5 flex justify-center items-center mb-0">
                             Please donate to support future development!
-                            <a href='https://ko-fi.com/J3J714R6RN' target='_blank'>
-						<img height='36' style={{border:"0px", height:"50px", marginTop:"10px"}} src='https://storage.ko-fi.com/cdn/kofi2.png?v=3' alt='Buy Me a Coffee at ko-fi.com' />
-						</a>
-                        </p>
+                        </div>
+                        <div className="mt-0 flex justify-center items-center">
+                            
+                            <a href="https://ko-fi.com/J3J714R6RN" target="_blank" rel="noopener noreferrer">
+                                <img
+                                height="36"
+                                style={{ border: "0px", height: "50px", marginTop: "10px" }}
+                                src="https://storage.ko-fi.com/cdn/kofi2.png?v=3"
+                                alt="Buy Me a Coffee at ko-fi.com"
+                                />
+                            </a>
+                        </div>
+
                     </div>
                 ) : (
                     <form onSubmit={handleSubmit} className="space-y-4">
@@ -129,6 +162,27 @@ const SubscriptionForm = () => {
                             />
                         </div>
 
+                        <div>
+                            <label
+                                htmlFor="county"
+                                className="block text-black text-sm font-medium"
+                            >County</label>
+                            <select
+                                id="county"
+                                required
+                                className="mt-1 block w-full p-2 border border-gray-300 rounded-md shadow-sm focus:outline-none focus:ring-2 focus:ring-green-500"
+                                value={selectedCounty}
+                                onChange={(e) => setSelectedCounty(e.target.value)}
+                            >
+                                <option value="">All</option>
+                                {counties?.map((county) => (
+                                    <option key={county.id} value={county.county}>
+                                        {county.county}
+                                    </option>
+                                ))}
+                            </select>
+                        </div>
+
                         {/* Lake Multi-Select Dropdown */}
                         <div>
                             <label htmlFor="lake" className="block text-black text-sm font-medium">
@@ -142,7 +196,9 @@ const SubscriptionForm = () => {
                                 required
                                 className="mt-1 block w-full p-2 border border-gray-300 rounded-md shadow-sm focus:outline-none focus:ring-2 focus:ring-green-500"
                             >
-                                {locations?.filter((a) => a.description)?.map((location) => (
+                                {locations?.filter(
+                                    (location) => location.county === selectedCounty || selectedCounty === ''
+                                ).filter((a) => a.description)?.map((location) => (
                                     <option key={location.location} value={location.location}>
                                         {location.description} - {location.county}
                                     </option>
