@@ -22,7 +22,6 @@ const SubscriptionForm = () => {
             if (response.error) {
                 console.error('Error fetching counties:', response.error);
             } else {
-                console.log(response.data);
                 setCounties(response.data);
             }
         });
@@ -50,9 +49,6 @@ const SubscriptionForm = () => {
 
     function handleSubmit(e) {
         e.preventDefault();
-
-        console.log('Email:', email);
-        console.log('Selected Lakes:', lakes);
 
         var newSubscription = {
             email: email,
@@ -100,6 +96,11 @@ const SubscriptionForm = () => {
 
     function getNameFromLocation(location) {
         return locations.find((loc) => loc.location === location)?.description || location;
+    }
+
+    //get just the location values for all locations in an array
+    function getLocations() {
+        return locations.map((location) => location.location);
     }
 
     return (

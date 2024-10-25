@@ -19,7 +19,6 @@ const WaFishStockNotifier = () => {
 
   const getUniqueReleaseLocations = (data) => {
     const locations = data.map((item) => item.release_location);
-    console.log(locations);
     return [...new Set(locations)]; // Remove duplicates
   };
 
@@ -67,6 +66,7 @@ const WaFishStockNotifier = () => {
       return new Date(a.release_start_date) - new Date(b.release_start_date);
     });
 
+
   return (
     <div className="min-h-screen flex flex-col">
       {/* Top bar */}
@@ -87,9 +87,10 @@ const WaFishStockNotifier = () => {
 
       </div>
 
+
       <div className="w-full max-w-screen-lg px-4 bg-brown-100 py-6 mx-auto">
 
-        {/*
+        {/*}
         <div className="
           flex justify-center items-center 
           bg-green-100 text-green-900 p-4 rounded-lg shadow-md
