@@ -34,7 +34,7 @@ async function sendEmail(from, to, subject, stockinginfo) {
       }
 }
 
-function updateLastStockedInfo(stockingDataToday) {
+async function updateLastStockedInfo(stockingDataToday) {
   for (const event of stockingDataToday) {
     const location = event.release_location;
     const lastStockedDate = event.release_start_date.split("T")[0]; // Extract YYYY-MM-DD from the timestamp
@@ -122,7 +122,7 @@ export default async function processSubscriptionsCronJob() {
     // update last_stocked in supabase with last stocked info (location, last_stocked, last_stocked_info, last_checked)
     // use a call to supabase to update the last_stocked table
 
-    updateLastStockedInfo(stockingDataToday);
+    await updateLastStockedInfo(stockingDataToday);
           
     var toNotify = [];
 
