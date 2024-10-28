@@ -34,6 +34,55 @@ async function sendEmail(from, to, subject, stockinginfo) {
       }
 }
 
+function updateLastStockedInfo(stockingDataToday) {
+  for (const event of stockingDataToday) {
+    const location = event.release_location;
+    const lastStockedDate = event.release_start_date.split("T")[0]; // Extract YYYY-MM-DD from the timestamp
+
+    const lastStockedInfo = {
+        species: event.species,
+        quantity: event.quantity,
+        fish_size: event.fish_size,
+        water: event.water,
+    };
+
+    // Find if the location is already in the last_stocked data
+    const existingRecord = lastStocked.find(item => item.location === location);
+
+    if (existingRecord) {
+        // Update the existing record if the last_stocked date is older
+        if (new Date(existingRecord.last_stocked) < new Date(lastStockedDate)) {
+            const { error } = await supabase
+                .from('last_stocked')
+                .update({
+                    last_stocked: lastStockedDate,
+                    last_checked: todaysDate,
+                    last_stocked_info: lastStockedInfo,
+                })
+                .eq('location', location);
+
+            if (error) {
+                console.error(`Error updating last_stocked for ${location}:`, error);
+            }
+        }
+    } else {
+        // Insert a new record for the location if it doesn't exist
+        const { error } = await supabase
+            .from('last_stocked')
+            .insert({
+                location: location,
+                last_stocked: lastStockedDate,
+                last_checked: todaysDate,
+                last_stocked_info: lastStockedInfo,
+            });
+
+        if (error) {
+            console.error(`Error inserting new last_stocked record for ${location}:`, error);
+        }
+    }
+}
+}
+
 export default async function processSubscriptionsCronJob() {
     const supabase = createClient();
     console.log("Starting subscription processing");
@@ -55,14 +104,7 @@ export default async function processSubscriptionsCronJob() {
 
     // Get today's date in PST
     var todaysDate = getPSTDate(new Date(new Date().setDate(new Date().getDate())));
-
-
-    // Get yesterday's date in PST
-    var yesterdaysDate = getPSTDate(new Date(new Date().setDate(new Date().getDate() - 1)));
-
     console.log("Today's Date (PST):", todaysDate);
-    console.log("Yesterday's Date (PST):", yesterdaysDate);
-
 
     const response = await fetch(`https://data.wa.gov/resource/6fex-3r7d.json?release_start_date=${todaysDate}T00:00:00.000`)
 
@@ -72,29 +114,16 @@ export default async function processSubscriptionsCronJob() {
         const stockingError = `Error: ${response.status} ${response.statusText}`;
         console.error(stockingError);
     } else {
-        stockingDataToday = await response.json();
+        stockingDataToday = await response.json() ?? [];
        // console.log('data for today ', stockingDataToday); // Now stockingData contains the parsed JSON response
     }    
 
-    const response2 = await fetch(`https://data.wa.gov/resource/6fex-3r7d.json?release_start_date=${yesterdaysDate}T00:00:00.000`)
-    var stockingDataYesterday
-    if (!response2.ok) {
-        const stockingError2 = `Error: ${response2.status} ${response2.statusText}`;
-        console.error(stockingError2);
-    } else {
-        stockingDataYesterday = await response2.json();
-        //console.log('data for yesterday ', stockingDataYesterday); // Now stockingData contains the parsed JSON response
-    }
+    // update stocking data with last stocked info
+    // update last_stocked in supabase with last stocked info (location, last_stocked, last_stocked_info, last_checked)
+    // use a call to supabase to update the last_stocked table
 
-    //find all the new events that arent in yesterdays data
-    var newStockingEvents = stockingDataToday.filter((item) => {
-        return !stockingDataYesterday.some((item2) => item2.release_location === item.release_location);
-    });
-
-    console.log('newStockingEvents', newStockingEvents);
-
-    // Loop through each subscription
-
+    updateLastStockedInfo(stockingDataToday);
+          
     var toNotify = [];
 
     for (const subscription of subscriptions) {
@@ -111,7 +140,7 @@ export default async function processSubscriptionsCronJob() {
 
         for (const location of subscription.locations) {
           //look for the location in the newStockingEvents
-          const locationData = newStockingEvents.filter((item) => item.release_location === location);
+          const locationData = stockingDataToday.filter((item) => item.release_location === location);
           
           if (locationData.length > 0) {
             //push each item into newStock
