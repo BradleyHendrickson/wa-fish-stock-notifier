@@ -34,54 +34,47 @@ async function sendEmail(from, to, subject, stockinginfo) {
       }
 }
 
-async function updateLastStockedInfo(stockingDataToday) {
-  for (const event of stockingDataToday) {
-    const location = event.release_location;
-    const lastStockedDate = event.release_start_date.split("T")[0]; // Extract YYYY-MM-DD from the timestamp
+async function updateLastStockedInfo(lastStocked, stockingDataToday) {
+  // print out the last stocked info
+  console.log('lastStocked', lastStocked);
+  // print out the stocking data for today
+  console.log('stockingDataToday', stockingDataToday);
 
-    const lastStockedInfo = {
-        species: event.species,
-        quantity: event.quantity,
-        fish_size: event.fish_size,
-        water: event.water,
-    };
+  // iterate through each location in the stockingDataToday
+  for (const location of stockingDataToday) {
 
-    // Find if the location is already in the last_stocked data
-    const existingRecord = lastStocked.find(item => item.location === location);
+    // check if the location is in the lastStocked
+    const locationIndex = lastStocked.findIndex((item) => item.location === location.release_location);
 
-    if (existingRecord) {
-        // Update the existing record if the last_stocked date is older
-        if (new Date(existingRecord.last_stocked) < new Date(lastStockedDate)) {
-            const { error } = await supabase
-                .from('last_stocked')
-                .update({
-                    last_stocked: lastStockedDate,
-                    last_checked: todaysDate,
-                    last_stocked_info: lastStockedInfo,
-                })
-                .eq('location', location);
-
-            if (error) {
-                console.error(`Error updating last_stocked for ${location}:`, error);
-            }
-        }
+    // if the location is in the lastStocked, update the last_stocked_info
+    if (locationIndex > -1) {
+      lastStocked[locationIndex].last_stocked = location.release_start_date;
+      lastStocked[locationIndex].last_stocked_info = location;
+      lastStocked[locationIndex].last_checked = new Date().toISOString();
     } else {
-        // Insert a new record for the location if it doesn't exist
-        const { error } = await supabase
-            .from('last_stocked')
-            .insert({
-                location: location,
-                last_stocked: lastStockedDate,
-                last_checked: todaysDate,
-                last_stocked_info: lastStockedInfo,
-            });
-
-        if (error) {
-            console.error(`Error inserting new last_stocked record for ${location}:`, error);
-        }
+      // if the location is not in the lastStocked, add it to the lastStocked
+      lastStocked.push({
+        location: location.release_location,
+        last_stocked: location.release_start_date,
+        last_stocked_info: location,
+        last_checked: new Date().toISOString()
+      });
     }
+  }
+
+  // update the last_stocked table in supabase
+  const supabase = createClient();
+  const { data: updatedLastStocked, error: supabaseError } = await supabase.from('last_stocked').upsert(lastStocked);
+  if (supabaseError) {
+
+    console.error('Error updating last stocked:', supabaseError);
+    return;
+  }
+
+  console.log('updatedLastStocked', updatedLastStocked);
 }
-}
+
+
 
 export default async function processSubscriptionsCronJob() {
     const supabase = createClient();
@@ -104,6 +97,8 @@ export default async function processSubscriptionsCronJob() {
 
     // Get today's date in PST
     var todaysDate = getPSTDate(new Date(new Date().setDate(new Date().getDate())));
+    //todaysDate = getPSTDate(new Date(new Date().setDate(new Date().getDate() - 1))); // test yesterday
+
     console.log("Today's Date (PST):", todaysDate);
 
     const response = await fetch(`https://data.wa.gov/resource/6fex-3r7d.json?release_start_date=${todaysDate}T00:00:00.000`)
@@ -122,8 +117,9 @@ export default async function processSubscriptionsCronJob() {
     // update last_stocked in supabase with last stocked info (location, last_stocked, last_stocked_info, last_checked)
     // use a call to supabase to update the last_stocked table
 
-    await updateLastStockedInfo(stockingDataToday);
-          
+    //await updateLastStockedInfo(stockingDataToday, lastStocked, supabase);
+    await updateLastStockedInfo(lastStocked, stockingDataToday)      
+
     var toNotify = [];
 
     for (const subscription of subscriptions) {

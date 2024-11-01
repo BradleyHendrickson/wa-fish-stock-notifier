@@ -3,12 +3,6 @@ import React, { useEffect, useState } from "react";
 import moment from "moment";
 import SubscriptionForm from "@/components/SubscriptionForm";
 
-function callServerSubscriptions() {
-  fetch("/api/cron")
-    .then((response) => response.json())
-    .then((data) => console.log(data))
-    .catch((error) => console.error(error));
-}
 
 const WaFishStockNotifier = () => {
   const [data, setData] = useState([]);
